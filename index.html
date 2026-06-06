@@ -1,0 +1,1233 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Sunnah Chef 🍯 — Game Edukasi Islam</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #FFF8E7;
+    --gold: #D4A373;
+    --gold-dark: #B8875A;
+    --honey: #F4C842;
+    --olive: #7FB069;
+    --olive-dark: #5A8A4A;
+    --rose: #E8A598;
+    --sky: #A8D5F0;
+    --red: #E05C5C;
+    --red-light: #F4A0A0;
+    --white: #FFFFFF;
+    --text-dark: #3D2B1F;
+    --text-mid: #7A5C44;
+    --shadow: rgba(61,43,31,0.15);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: var(--cream);
+    min-height: 100dvh;
+    overflow-x: hidden;
+    user-select: none;
+  }
+
+  /* =========== SCREENS =========== */
+  .screen { display: none; min-height: 100dvh; flex-direction: column; align-items: center; justify-content: center; padding: 20px; animation: fadeIn 0.4s ease; }
+  .screen.active { display: flex; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* =========== LANDING =========== */
+  #screen-landing {
+    background: linear-gradient(160deg, #FFF4D6 0%, #FFE8B0 50%, #FFD98A 100%);
+    position: relative; overflow: hidden;
+  }
+  #screen-landing::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(circle at 20% 80%, rgba(212,163,115,0.2) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(127,176,105,0.15) 0%, transparent 50%);
+    pointer-events: none;
+  }
+  .floating-items { position: absolute; width: 100%; height: 100%; pointer-events: none; overflow: hidden; }
+  .float-emoji { position: absolute; font-size: clamp(1.2rem, 4vw, 2rem); animation: floatAround linear infinite; opacity: 0.35; }
+  @keyframes floatAround {
+    0% { transform: translateY(110vh) rotate(0deg); }
+    100% { transform: translateY(-10vh) rotate(360deg); }
+  }
+  .game-logo { text-align: center; position: relative; z-index: 1; margin-bottom: 8px; }
+  .logo-icon { font-size: clamp(4rem, 15vw, 7rem); display: block; animation: bounce 2s ease-in-out infinite; }
+  @keyframes bounce { 0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)} }
+  .logo-title {
+    font-family: 'Fredoka One', cursive;
+    font-size: clamp(2.2rem, 9vw, 4rem);
+    color: var(--text-dark);
+    line-height: 1;
+    text-shadow: 3px 3px 0 rgba(212,163,115,0.5);
+  }
+  .logo-sub { font-size: clamp(0.85rem, 3vw, 1.1rem); color: var(--text-mid); font-weight: 700; margin-top: 4px; letter-spacing: 0.5px; }
+  .badge-halal {
+    display: inline-block; background: var(--olive); color: white;
+    font-size: 0.75rem; font-weight: 800; padding: 3px 10px; border-radius: 20px;
+    margin-top: 8px; letter-spacing: 1px; text-transform: uppercase;
+  }
+  .landing-card {
+    background: white; border-radius: 28px; padding: 24px 20px; width: 100%; max-width: 380px;
+    box-shadow: 0 8px 32px var(--shadow), 0 2px 8px rgba(0,0,0,0.05);
+    position: relative; z-index: 1;
+  }
+  .btn-main {
+    display: block; width: 100%;
+    background: linear-gradient(135deg, var(--honey), var(--gold));
+    color: var(--text-dark); border: none; border-radius: 18px;
+    font-family: 'Fredoka One', cursive; font-size: 1.3rem;
+    padding: 16px 24px; cursor: pointer; text-align: center;
+    box-shadow: 0 4px 0 var(--gold-dark), 0 6px 16px rgba(212,163,115,0.4);
+    transition: transform 0.1s, box-shadow 0.1s; text-decoration: none;
+    margin-bottom: 12px; letter-spacing: 0.5px;
+  }
+  .btn-main:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--gold-dark), 0 3px 8px rgba(212,163,115,0.3); }
+  .btn-secondary {
+    display: block; width: 100%;
+    background: white; color: var(--text-mid);
+    border: 2.5px solid var(--gold); border-radius: 18px;
+    font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 1rem;
+    padding: 13px 24px; cursor: pointer; text-align: center; transition: background 0.2s;
+    text-decoration: none;
+  }
+  .btn-secondary:hover { background: #FFF4D6; }
+  .divider { text-align: center; color: var(--text-mid); font-size: 0.85rem; margin: 10px 0; font-weight: 600; }
+
+  /* =========== FORMS =========== */
+  .form-screen { background: linear-gradient(160deg, #FFF4D6 0%, #FFE8B0 100%); }
+  .form-card {
+    background: white; border-radius: 28px; padding: 28px 22px; width: 100%; max-width: 400px;
+    box-shadow: 0 8px 32px var(--shadow);
+  }
+  .form-title {
+    font-family: 'Fredoka One', cursive; font-size: 1.7rem; color: var(--text-dark);
+    text-align: center; margin-bottom: 4px;
+  }
+  .form-sub { text-align: center; color: var(--text-mid); font-size: 0.9rem; margin-bottom: 20px; font-weight: 600; }
+  .input-group { margin-bottom: 16px; }
+  .input-label { font-weight: 800; color: var(--text-dark); font-size: 0.9rem; margin-bottom: 6px; display: block; }
+  .input-field {
+    width: 100%; padding: 13px 16px; border: 2.5px solid #E8D9C0; border-radius: 14px;
+    font-family: 'Nunito', sans-serif; font-size: 1rem; color: var(--text-dark);
+    background: #FAFAFA; outline: none; transition: border-color 0.2s;
+  }
+  .input-field:focus { border-color: var(--gold); background: white; }
+  .input-field.error { border-color: var(--red); background: #FFF5F5; }
+  .error-msg { color: var(--red); font-size: 0.8rem; font-weight: 700; margin-top: 5px; display: none; }
+  .error-msg.show { display: block; }
+  .btn-green {
+    display: block; width: 100%;
+    background: linear-gradient(135deg, #95D46B, var(--olive));
+    color: white; border: none; border-radius: 18px;
+    font-family: 'Fredoka One', cursive; font-size: 1.2rem;
+    padding: 15px 24px; cursor: pointer; text-align: center;
+    box-shadow: 0 4px 0 var(--olive-dark), 0 6px 16px rgba(127,176,105,0.4);
+    transition: transform 0.1s, box-shadow 0.1s; margin-top: 4px;
+  }
+  .btn-green:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--olive-dark); }
+  .back-link { text-align: center; margin-top: 14px; color: var(--text-mid); font-size: 0.9rem; font-weight: 700; cursor: pointer; }
+  .back-link:hover { color: var(--text-dark); }
+
+  /* =========== WELCOME / ID SCREEN =========== */
+  #screen-welcome { background: linear-gradient(160deg, #E8F8E8 0%, #C8ECC8 100%); }
+  .id-card {
+    background: white; border-radius: 28px; padding: 30px 24px; width: 100%; max-width: 380px;
+    box-shadow: 0 8px 32px var(--shadow); text-align: center;
+  }
+  .id-avatar { font-size: 4rem; margin-bottom: 8px; }
+  .id-greeting { font-family: 'Fredoka One', cursive; font-size: 1.6rem; color: var(--text-dark); }
+  .id-name { font-size: 1.1rem; color: var(--olive-dark); font-weight: 800; margin: 4px 0; }
+  .id-box {
+    background: linear-gradient(135deg, #FFF4D6, #FFE8A0);
+    border: 2px dashed var(--gold); border-radius: 14px;
+    padding: 14px; margin: 16px 0;
+  }
+  .id-label { font-size: 0.78rem; font-weight: 800; color: var(--text-mid); text-transform: uppercase; letter-spacing: 1px; }
+  .id-value { font-family: 'Fredoka One', cursive; font-size: 2rem; color: var(--text-dark); letter-spacing: 2px; }
+  .id-hint { font-size: 0.8rem; color: var(--text-mid); margin-top: 6px; }
+
+  /* =========== GAME SCREEN =========== */
+  #screen-game {
+    background: linear-gradient(180deg, #87CEEB 0%, #B8E4F9 40%, #FFF8E7 100%);
+    padding: 0; position: relative; overflow: hidden; justify-content: flex-start;
+  }
+  .game-header {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    background: rgba(255,255,255,0.92); backdrop-filter: blur(8px);
+    padding: 10px 16px; display: flex; align-items: center; gap: 10px;
+    border-bottom: 2px solid rgba(212,163,115,0.2);
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+  }
+  .hdr-btn { font-size: 1.2rem; cursor: pointer; padding: 4px 8px; border-radius: 8px; transition: background 0.2s; }
+  .hdr-btn:hover { background: #F0E8D0; }
+  .hdr-level { font-family: 'Fredoka One', cursive; font-size: 1rem; color: var(--text-dark); flex: 1; text-align: center; }
+  .hdr-score { font-family: 'Fredoka One', cursive; font-size: 1.1rem; color: var(--gold-dark); }
+  .score-star { font-size: 0.9rem; }
+
+  .game-body { width: 100%; max-width: 480px; margin: 0 auto; padding: 80px 16px 20px; display: flex; flex-direction: column; min-height: 100dvh; }
+
+  /* Hadits banner */
+  .hadits-banner {
+    background: rgba(255,255,255,0.85); border-radius: 16px; padding: 10px 14px;
+    font-size: 0.82rem; color: var(--text-mid); font-style: italic; text-align: center;
+    margin-bottom: 12px; border-left: 4px solid var(--gold); line-height: 1.4;
+  }
+
+  /* Drop zones */
+  .zones-row { display: flex; gap: 12px; margin-bottom: 16px; }
+  .drop-zone {
+    flex: 1; border-radius: 22px; padding: 16px 10px; min-height: 120px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    border: 3px dashed transparent; transition: all 0.25s; position: relative;
+    cursor: default;
+  }
+  .drop-zone.halal-zone {
+    background: linear-gradient(135deg, rgba(127,176,105,0.15), rgba(149,212,107,0.2));
+    border-color: var(--olive);
+  }
+  .drop-zone.haram-zone {
+    background: linear-gradient(135deg, rgba(224,92,92,0.1), rgba(244,160,160,0.15));
+    border-color: var(--red);
+  }
+  .drop-zone.drag-over { transform: scale(1.04); box-shadow: 0 0 0 4px rgba(127,176,105,0.35); }
+  .drop-zone.haram-zone.drag-over { box-shadow: 0 0 0 4px rgba(224,92,92,0.3); }
+  .zone-icon { font-size: 2.2rem; margin-bottom: 4px; }
+  .zone-label { font-family: 'Fredoka One', cursive; font-size: 1rem; }
+  .zone-label.green { color: var(--olive-dark); }
+  .zone-label.red { color: var(--red); }
+  .zone-sub { font-size: 0.72rem; color: var(--text-mid); font-weight: 700; }
+
+  /* Falling item */
+  .falling-area {
+    flex: 1; display: flex; align-items: center; justify-content: center;
+    min-height: 180px; position: relative;
+  }
+  .food-item {
+    display: flex; flex-direction: column; align-items: center; gap: 6px;
+    cursor: grab; animation: popIn 0.4s cubic-bezier(0.34,1.56,0.64,1);
+    position: relative;
+  }
+  .food-item:active { cursor: grabbing; }
+  @keyframes popIn { from{transform:scale(0) rotate(-10deg);opacity:0} to{transform:scale(1) rotate(0);opacity:1} }
+  .food-emoji {
+    font-size: clamp(3.5rem, 15vw, 5.5rem);
+    filter: drop-shadow(0 6px 12px rgba(0,0,0,0.15));
+    transition: transform 0.15s;
+    display: block; text-align: center;
+    animation: wobble 3s ease-in-out infinite;
+  }
+  @keyframes wobble { 0%,100%{transform:rotate(-3deg)}50%{transform:rotate(3deg)} }
+  .food-name {
+    background: white; color: var(--text-dark); font-weight: 800; font-size: 0.9rem;
+    padding: 5px 14px; border-radius: 20px; box-shadow: 0 3px 10px var(--shadow);
+    white-space: nowrap;
+  }
+  .food-item.dragging { opacity: 0.5; }
+
+  /* Ghost for drag */
+  #drag-ghost { position: fixed; pointer-events: none; z-index: 9999; font-size: 4rem; transform: translate(-50%, -50%); display: none; }
+
+  /* Instruction arrows */
+  .swipe-hints { display: flex; justify-content: space-between; padding: 0 8px; margin-top: -4px; }
+  .swipe-hint { font-size: 0.75rem; color: var(--text-mid); font-weight: 700; }
+  .swipe-hint.left { color: var(--red); }
+  .swipe-hint.right { color: var(--olive-dark); }
+
+  /* Progress bar */
+  .progress-bar-wrap { height: 8px; background: rgba(0,0,0,0.08); border-radius: 10px; margin: 10px 0; overflow: hidden; }
+  .progress-bar-fill { height: 100%; background: linear-gradient(90deg, var(--honey), var(--gold)); border-radius: 10px; transition: width 0.5s ease; }
+
+  /* Feedback overlays */
+  .feedback-overlay {
+    position: fixed; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    z-index: 500; pointer-events: none; opacity: 0; transition: opacity 0.2s;
+  }
+  .feedback-overlay.show { opacity: 1; pointer-events: auto; }
+  .feedback-text { font-family: 'Fredoka One', cursive; font-size: clamp(2rem, 10vw, 3.5rem); text-shadow: 0 4px 12px rgba(0,0,0,0.2); animation: feedPop 0.5s cubic-bezier(0.34,1.56,0.64,1); }
+  @keyframes feedPop { from{transform:scale(0.5);opacity:0} to{transform:scale(1);opacity:1} }
+  .feedback-sub { font-family: 'Nunito', sans-serif; font-size: 1rem; font-weight: 700; color: white; text-shadow: 0 2px 6px rgba(0,0,0,0.3); text-align: center; max-width: 280px; padding: 8px 16px; background: rgba(0,0,0,0.2); border-radius: 14px; margin-top: 8px; }
+  .feedback-overlay.correct { background: radial-gradient(circle, rgba(127,176,105,0.85) 0%, rgba(149,212,107,0.75) 100%); }
+  .feedback-overlay.wrong { background: radial-gradient(circle, rgba(224,92,92,0.85) 0%, rgba(244,100,100,0.75) 100%); }
+
+  /* Particles */
+  .particle { position: fixed; pointer-events: none; font-size: 1.5rem; z-index: 600; animation: particleFly 0.9s ease-out forwards; }
+  @keyframes particleFly { 0%{opacity:1;transform:translate(0,0) scale(1)} 100%{opacity:0;transform:translate(var(--dx),var(--dy)) scale(0.3)} }
+
+  /* =========== HADITS REVEAL =========== */
+  #screen-hadits {
+    background: linear-gradient(160deg, #1A3A2A 0%, #2D6A4A 50%, #1A4A30 100%);
+  }
+  .hadits-card {
+    background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 28px; padding: 30px 24px; max-width: 400px; width: 100%; text-align: center;
+    backdrop-filter: blur(10px);
+  }
+  .hadits-icon { font-size: 3.5rem; margin-bottom: 12px; }
+  .hadits-unlocked-label { color: var(--honey); font-size: 0.85rem; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 8px; }
+  .hadits-arabic { color: white; font-size: 1.4rem; line-height: 1.7; margin-bottom: 10px; font-weight: 600; direction: rtl; }
+  .hadits-translation { color: rgba(255,255,255,0.8); font-size: 0.9rem; line-height: 1.6; font-style: italic; }
+  .hadits-source { color: var(--honey); font-size: 0.78rem; font-weight: 800; margin-top: 10px; }
+
+  /* =========== LEVEL COMPLETE =========== */
+  #screen-levelcomplete {
+    background: linear-gradient(160deg, #FFF4D6 0%, #FFD98A 100%);
+  }
+  .level-complete-card {
+    background: white; border-radius: 28px; padding: 30px 24px; max-width: 380px; width: 100%;
+    box-shadow: 0 8px 32px var(--shadow); text-align: center;
+  }
+  .lc-icon { font-size: 4rem; animation: bounce 1s ease-in-out infinite; }
+  .lc-title { font-family: 'Fredoka One', cursive; font-size: 2rem; color: var(--text-dark); margin: 8px 0; }
+  .lc-score-row { display: flex; justify-content: center; gap: 8px; margin: 12px 0; }
+  .lc-star { font-size: 2rem; transition: transform 0.3s; }
+  .lc-star.earned { animation: starPop 0.4s cubic-bezier(0.34,1.56,0.64,1) forwards; }
+  @keyframes starPop { from{transform:scale(0) rotate(-30deg)} to{transform:scale(1) rotate(0)} }
+  .lc-points { font-family: 'Fredoka One', cursive; font-size: 1.5rem; color: var(--gold-dark); margin-bottom: 16px; }
+  .infaq-banner {
+    background: linear-gradient(135deg, #E8F5E0, #D4F0C0); border: 2px solid var(--olive);
+    border-radius: 16px; padding: 14px; margin-bottom: 16px; text-align: left; cursor: pointer;
+    transition: transform 0.2s;
+  }
+  .infaq-banner:hover { transform: scale(1.02); }
+  .infaq-title { font-weight: 800; color: var(--olive-dark); font-size: 0.9rem; margin-bottom: 2px; }
+  .infaq-desc { font-size: 0.78rem; color: var(--text-mid); }
+
+  /* =========== POPUP / MODAL =========== */
+  .modal-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 800;
+    display: none; align-items: center; justify-content: center; padding: 20px;
+    animation: fadeIn 0.2s ease;
+  }
+  .modal-overlay.show { display: flex; }
+  .modal-box {
+    background: white; border-radius: 24px; padding: 24px 20px; max-width: 360px; width: 100%;
+    box-shadow: 0 16px 48px rgba(0,0,0,0.2); text-align: center;
+  }
+  .modal-icon { font-size: 3rem; margin-bottom: 8px; }
+  .modal-title { font-family: 'Fredoka One', cursive; font-size: 1.5rem; color: var(--text-dark); margin-bottom: 8px; }
+  .modal-text { color: var(--text-mid); font-size: 0.9rem; line-height: 1.5; margin-bottom: 16px; }
+  .modal-btns { display: flex; gap: 10px; }
+  .modal-btns .btn-main, .modal-btns .btn-secondary { margin: 0; flex: 1; font-size: 0.95rem; padding: 12px; }
+
+  /* =========== INTRO / HOW TO PLAY =========== */
+  #screen-howto { background: linear-gradient(160deg, #FFF4D6 0%, #FFE8B0 100%); }
+  .howto-card { background: white; border-radius: 28px; padding: 28px 22px; max-width: 400px; width: 100%; box-shadow: 0 8px 32px var(--shadow); }
+  .howto-title { font-family: 'Fredoka One', cursive; font-size: 1.7rem; color: var(--text-dark); text-align: center; margin-bottom: 16px; }
+  .howto-step { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 14px; padding: 12px; background: #FAFAFA; border-radius: 14px; }
+  .howto-num { font-family: 'Fredoka One', cursive; font-size: 1.5rem; color: var(--gold-dark); min-width: 32px; }
+  .howto-text { font-size: 0.9rem; color: var(--text-mid); font-weight: 600; line-height: 1.4; }
+  .howto-text b { color: var(--text-dark); }
+
+  /* =========== RESPONSIVE =========== */
+  @media (max-width: 360px) {
+    .zones-row { gap: 8px; }
+    .drop-zone { min-height: 100px; padding: 12px 8px; }
+    .food-emoji { font-size: 3rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Drag Ghost -->
+<div id="drag-ghost">🍯</div>
+
+<!-- ============================================================ -->
+<!-- SCREEN 1: LANDING -->
+<!-- ============================================================ -->
+<div id="screen-landing" class="screen active">
+  <div class="floating-items" id="floatingItems"></div>
+  <div class="game-logo">
+    <span class="logo-icon">🍯</span>
+    <div class="logo-title">Sunnah Chef</div>
+    <div class="logo-sub">Masak Makanan Pilihan Nabi ﷺ</div>
+    <span class="badge-halal">✓ Edukasi Islami untuk Anak</span>
+  </div>
+  <div style="height: 20px;"></div>
+  <div class="landing-card">
+    <button class="btn-main" onclick="showScreen('screen-howto')">🎮 Main Sekarang!</button>
+    <button class="btn-secondary" onclick="showScreen('screen-login')">🔑 Sudah Punya ID?</button>
+    <div class="divider">— atau —</div>
+    <a class="btn-secondary" href="https://wa.me/62895322412300" target="_blank" style="display:block;text-align:center;border-color:var(--olive);color:var(--olive-dark)">
+      📱 Tanya ke @goldenflow.id
+    </a>
+  </div>
+  <div style="margin-top: 16px; text-align:center; font-size:0.78rem; color:var(--text-mid);">
+    Made with ❤️ by <strong>Golden Flow Travel</strong> • <a href="https://instagram.com/goldenflow.id" target="_blank" style="color:var(--gold-dark);">@goldenflow.id</a>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- SCREEN 2: HOW TO PLAY -->
+<!-- ============================================================ -->
+<div id="screen-howto" class="screen">
+  <div class="howto-card">
+    <div class="howto-title">🎓 Cara Main</div>
+    <div class="howto-step">
+      <div class="howto-num">1</div>
+      <div class="howto-text">Kamu akan melihat <b>makanan/minuman</b> di tengah layar 🍯</div>
+    </div>
+    <div class="howto-step">
+      <div class="howto-num">2</div>
+      <div class="howto-text"><b>Seret ke kanan</b> 🟢 kalau itu makanan <b>Sunnah Nabi ﷺ</b></div>
+    </div>
+    <div class="howto-step">
+      <div class="howto-num">3</div>
+      <div class="howto-text"><b>Seret ke kiri</b> 🔴 kalau itu makanan <b>Haram/Tidak Baik</b></div>
+    </div>
+    <div class="howto-step">
+      <div class="howto-num">4</div>
+      <div class="howto-text">Jawab <b>5 makanan dengan benar</b> untuk naik level dan buka <b>Hadits Nabi ﷺ!</b> 📖</div>
+    </div>
+    <div style="background:#FFF8E7;border-radius:14px;padding:12px;margin-bottom:16px;font-size:0.82rem;color:var(--text-mid);text-align:center;">
+      💡 <strong>Tips:</strong> Tidak ada hukuman keras — yang penting semangat belajar!
+    </div>
+    <button class="btn-main" onclick="goToRegister()">🚀 Daftar & Mulai!</button>
+    <div class="back-link" onclick="showScreen('screen-landing')">← Kembali</div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- SCREEN 3: REGISTER -->
+<!-- ============================================================ -->
+<div id="screen-register" class="screen form-screen">
+  <div class="form-card">
+    <div class="form-title">📝 Daftar Dulu</div>
+    <div class="form-sub">Biar Ayah/Bunda bantu isi ya!</div>
+
+    <div class="input-group">
+      <label class="input-label">👦 Nama Anak</label>
+      <input type="text" id="reg-nama" class="input-field" placeholder="Contoh: Ahmad Zaky" autocomplete="name">
+      <div class="error-msg" id="err-nama">Nama harus diisi!</div>
+    </div>
+    <div class="input-group">
+      <label class="input-label">📱 WhatsApp Orang Tua</label>
+      <input type="tel" id="reg-wa" class="input-field" placeholder="+628xxxxxxxxxx" autocomplete="tel">
+      <div class="error-msg" id="err-wa">Format: +628xxxxxxxxxx (min 12 angka)</div>
+    </div>
+    <div class="input-group">
+      <label class="input-label">📧 Email (opsional)</label>
+      <input type="email" id="reg-email" class="input-field" placeholder="email@contoh.com" autocomplete="email">
+      <div class="error-msg" id="err-email">Format email tidak valid</div>
+    </div>
+
+    <button class="btn-green" onclick="doRegister()">✅ Daftar Sekarang</button>
+    <div class="back-link" onclick="showScreen('screen-landing')">← Kembali</div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- SCREEN 4: LOGIN -->
+<!-- ============================================================ -->
+<div id="screen-login" class="screen form-screen">
+  <div class="form-card">
+    <div class="form-title">🔑 Masuk dengan ID</div>
+    <div class="form-sub">Ketik ID kamu yang sudah dapat sebelumnya</div>
+    <div class="input-group">
+      <label class="input-label">🎮 ID Pemain</label>
+      <input type="text" id="login-id" class="input-field" placeholder="Contoh: SUN-A7B2" maxlength="8" style="text-transform:uppercase;letter-spacing:2px;font-family:'Fredoka One',cursive;font-size:1.2rem;">
+      <div class="error-msg" id="err-loginid">ID tidak ditemukan. Cek lagi ya!</div>
+    </div>
+    <button class="btn-green" onclick="doLogin()">🚀 Masuk!</button>
+    <div class="back-link" onclick="showScreen('screen-landing')">← Kembali</div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- SCREEN 5: WELCOME (ID REVEALED) -->
+<!-- ============================================================ -->
+<div id="screen-welcome" class="screen">
+  <div class="id-card">
+    <div class="id-avatar">🌟</div>
+    <div class="id-greeting">MashaAllah!</div>
+    <div class="id-name" id="welcome-name">Ahmad Zaky</div>
+    <div class="id-box">
+      <div class="id-label">ID Pemain Kamu</div>
+      <div class="id-value" id="welcome-id">SUN-A7B2</div>
+      <div class="id-hint">📌 Simpan ID ini untuk main lagi!</div>
+    </div>
+    <div style="font-size:0.82rem;color:var(--text-mid);margin-bottom:16px;line-height:1.5;">
+      Bismillah... siap belajar tentang makanan sunnah Nabi ﷺ! 🍯
+    </div>
+    <button class="btn-main" onclick="startGame()">🎮 Mulai Bermain!</button>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- SCREEN 6: GAME -->
+<!-- ============================================================ -->
+<div id="screen-game" class="screen">
+  <div class="game-header">
+    <span class="hdr-btn" onclick="showPauseModal()">⏸️</span>
+    <div class="hdr-level" id="hdr-level">Level 1 • 0/5</div>
+    <div class="hdr-score"><span class="score-star">⭐</span> <span id="hdr-score">0</span></div>
+  </div>
+
+  <div class="game-body">
+    <div class="progress-bar-wrap"><div class="progress-bar-fill" id="progress-fill" style="width:0%"></div></div>
+
+    <div class="hadits-banner" id="hadits-banner">🌿 <em>"Makanlah makanan yang halal lagi baik..."</em> (QS. Al-Baqarah: 168)</div>
+
+    <div class="zones-row">
+      <div class="drop-zone haram-zone" id="zone-haram" 
+           ondragover="onDragOver(event,'haram')" ondragleave="onDragLeave('haram')" ondrop="onDrop(event,'haram')"
+           ontouchend="onTouchEndZone(event,'haram')">
+        <div class="zone-icon">🗑️</div>
+        <div class="zone-label red">Haram / Makruh</div>
+        <div class="zone-sub">Tidak untuk dimakan</div>
+      </div>
+      <div class="drop-zone halal-zone" id="zone-halal"
+           ondragover="onDragOver(event,'halal')" ondragleave="onDragLeave('halal')" ondrop="onDrop(event,'halal')"
+           ontouchend="onTouchEndZone(event,'halal')">
+        <div class="zone-icon">🍽️</div>
+        <div class="zone-label green">Sunnah ✓</div>
+        <div class="zone-sub">Makanan pilihan Nabi ﷺ</div>
+      </div>
+    </div>
+
+    <div class="swipe-hints">
+      <span class="swipe-hint left">← Geser kiri = Haram</span>
+      <span class="swipe-hint right">Geser kanan = Sunnah →</span>
+    </div>
+
+    <div class="falling-area" id="falling-area">
+      <!-- Food item injected here -->
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- SCREEN 7: HADITS UNLOCK -->
+<!-- ============================================================ -->
+<div id="screen-hadits" class="screen">
+  <div class="hadits-card">
+    <div class="hadits-icon" id="hadits-unlock-icon">📖</div>
+    <div class="hadits-unlocked-label">✨ Hadits Terbuka!</div>
+    <div class="hadits-arabic" id="hadits-arabic">بِسْمِ اللَّهِ</div>
+    <div class="hadits-translation" id="hadits-translation">"Dengan nama Allah"</div>
+    <div class="hadits-source" id="hadits-source">— HR. Bukhari</div>
+    <div style="height:20px"></div>
+    <button class="btn-main" onclick="goToLevelComplete()">🎉 Lanjutkan!</button>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- SCREEN 8: LEVEL COMPLETE -->
+<!-- ============================================================ -->
+<div id="screen-levelcomplete" class="screen">
+  <div class="level-complete-card">
+    <div class="lc-icon">🏆</div>
+    <div class="lc-title" id="lc-title">Level 1 Selesai!</div>
+    <div class="lc-score-row" id="lc-stars">
+      <span class="lc-star">⭐</span><span class="lc-star">⭐</span><span class="lc-star">⭐</span>
+    </div>
+    <div class="lc-points" id="lc-points">+50 Poin</div>
+
+    <div class="infaq-banner" onclick="openInfaqModal()">
+      <div class="infaq-title">🤲 Dukung Game Islami Ini</div>
+      <div class="infaq-desc">Infaq sukarela mulai Rp10.000 membantu kami membuat konten dakwah lebih banyak!</div>
+    </div>
+
+    <button class="btn-main" onclick="nextLevel()">▶️ Level Berikutnya!</button>
+    <div style="height:8px"></div>
+    <button class="btn-secondary" onclick="shareWhatsApp()">📤 Share ke Teman</button>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- FEEDBACK OVERLAYS -->
+<!-- ============================================================ -->
+<div class="feedback-overlay correct" id="feedback-correct">
+  <div class="feedback-text">MashaAllah! ✨</div>
+  <div class="feedback-sub" id="feedback-correct-text">Benar! Ini makanan sunnah Nabi ﷺ</div>
+</div>
+<div class="feedback-overlay wrong" id="feedback-wrong">
+  <div class="feedback-text">Hmm... 🤔</div>
+  <div class="feedback-sub" id="feedback-wrong-text">Coba lagi, semangat!</div>
+</div>
+
+<!-- ============================================================ -->
+<!-- MODALS -->
+<!-- ============================================================ -->
+<!-- Pause -->
+<div class="modal-overlay" id="modal-pause">
+  <div class="modal-box">
+    <div class="modal-icon">⏸️</div>
+    <div class="modal-title">Jeda Dulu</div>
+    <div class="modal-text">Mau istirahat? Atau keluar ke menu utama?</div>
+    <div class="modal-btns">
+      <button class="btn-secondary" onclick="closePauseModal()">▶️ Lanjut</button>
+      <button class="btn-main" onclick="goHome()">🏠 Menu</button>
+    </div>
+  </div>
+</div>
+<!-- Infaq -->
+<div class="modal-overlay" id="modal-infaq">
+  <div class="modal-box">
+    <div class="modal-icon">💚</div>
+    <div class="modal-title">Infaq Jariyah</div>
+    <div class="modal-text">
+      Infaq sukarela untuk pengembangan game edukasi Islam ini.<br><br>
+      <strong>Bank Syariah Indonesia</strong><br>
+      A/N: <strong>Golden Chandra Oentoro</strong><br>
+      No. Rek: <em>(hubungi admin)</em><br><br>
+      📱 Konfirmasi via WhatsApp:
+    </div>
+    <div class="modal-btns">
+      <button class="btn-secondary" onclick="closeInfaqModal()">Nanti</button>
+      <a class="btn-main" href="https://wa.me/62895322412300?text=Assalamualaikum%2C%20saya%20ingin%20infaq%20untuk%20game%20Sunnah%20Chef%20%F0%9F%8C%BF" target="_blank" onclick="closeInfaqModal()" style="display:flex;align-items:center;justify-content:center;gap:4px">
+        📲 Hubungi Admin
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- JAVASCRIPT -->
+<!-- ============================================================ -->
+<script>
+// ==================== GOOGLE APPS SCRIPT CONFIG ====================
+// Setelah deploy GAS, paste URL-nya di sini:
+const GAS_URL = 'PASTE_URL_GOOGLE_APPS_SCRIPT_KAMU_DI_SINI';
+// Contoh: 'https://script.google.com/macros/s/AKfyc.../exec'
+
+// Helper: POST ke GAS
+async function gasPost(payload) {
+  try {
+    const res = await fetch(GAS_URL, {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+    return await res.json();
+  } catch (err) {
+    console.warn('GAS offline, pakai localStorage saja:', err.message);
+    return { ok: false, offline: true };
+  }
+}
+
+// Helper: GET ke GAS
+async function gasGet(params) {
+  try {
+    const url = GAS_URL + '?' + new URLSearchParams(params).toString();
+    const res = await fetch(url);
+    return await res.json();
+  } catch (err) {
+    console.warn('GAS offline:', err.message);
+    return { ok: false, offline: true };
+  }
+}
+
+// Loading overlay
+function showLoading(msg = 'Menyimpan...') {
+  let el = document.getElementById('loading-overlay');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'loading-overlay';
+    el.style.cssText = `
+      position:fixed;inset:0;background:rgba(255,248,231,0.92);
+      display:flex;flex-direction:column;align-items:center;justify-content:center;
+      z-index:9000;font-family:'Fredoka One',cursive;
+    `;
+    document.body.appendChild(el);
+  }
+  el.innerHTML = `
+    <div style="font-size:3rem;animation:bounce 1s infinite">⏳</div>
+    <div style="font-size:1.2rem;color:#3D2B1F;margin-top:12px">${msg}</div>
+    <div style="font-size:0.82rem;color:#7A5C44;margin-top:6px">Bismillah...</div>
+  `;
+  el.style.display = 'flex';
+}
+function hideLoading() {
+  const el = document.getElementById('loading-overlay');
+  if (el) el.style.display = 'none';
+}
+
+// Toast notification
+function showToast(msg, type = 'success') {
+  const colors = { success: '#7FB069', error: '#E05C5C', info: '#D4A373' };
+  let el = document.getElementById('toast-msg');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'toast-msg';
+    el.style.cssText = `
+      position:fixed;bottom:24px;left:50%;transform:translateX(-50%);
+      padding:12px 22px;border-radius:20px;color:white;font-weight:700;
+      font-size:0.9rem;z-index:9100;transition:opacity 0.3s;
+      font-family:'Nunito',sans-serif;max-width:90vw;text-align:center;
+      box-shadow:0 4px 16px rgba(0,0,0,0.2);
+    `;
+    document.body.appendChild(el);
+  }
+  el.textContent = msg;
+  el.style.background = colors[type] || colors.info;
+  el.style.opacity = '1';
+  clearTimeout(el._timer);
+  el._timer = setTimeout(() => { el.style.opacity = '0'; }, 2800);
+}
+
+// ==================== DATA ====================
+const FOOD_DATA = [
+  // Sunnah (isHalal: true)
+  { emoji: '🌴', name: 'Kurma', isHalal: true, info: 'Kurma adalah sunnah berbuka puasa', hadits: true },
+  { emoji: '🍯', name: 'Madu', isHalal: true, info: 'Madu adalah obat yang disebutkan dalam Al-Quran', hadits: true },
+  { emoji: '🫒', name: 'Zaitun', isHalal: true, info: 'Minyak zaitun dari pohon yang diberkahi', hadits: true },
+  { emoji: '🌱', name: 'Habbatussauda', isHalal: true, info: 'Obat untuk segala penyakit kecuali kematian', hadits: true },
+  { emoji: '💧', name: 'Air Zamzam', isHalal: true, info: 'Air yang penuh berkah dari Mekkah', hadits: true },
+  { emoji: '🍶', name: 'Susu', isHalal: true, info: 'Minuman yang disukai Nabi ﷺ', hadits: false },
+  { emoji: '🌾', name: 'Gandum', isHalal: true, info: 'Makanan pokok yang penuh nutrisi', hadits: false },
+  { emoji: '🍖', name: 'Daging Halal', isHalal: true, info: 'Daging yang disembelih dengan nama Allah', hadits: false },
+  { emoji: '🐟', name: 'Ikan', isHalal: true, info: 'Ikan halal dimakan tanpa perlu disembelih', hadits: false },
+  { emoji: '🍎', name: 'Buah-buahan', isHalal: true, info: 'Buah yang Allah ciptakan sebagai rezeki', hadits: false },
+  { emoji: '🥬', name: 'Sayuran', isHalal: true, info: 'Sayuran bergizi yang menyehatkan badan', hadits: false },
+
+  // Haram/Makruh (isHalal: false)
+  { emoji: '🐷', name: 'Babi', isHalal: false, info: 'Babi diharamkan dalam Al-Quran (QS. Al-Baqarah: 173)', hadits: false },
+  { emoji: '🍺', name: 'Minuman Keras', isHalal: false, info: 'Khamr (alkohol) haram dalam Islam', hadits: false },
+  { emoji: '🩸', name: 'Darah', isHalal: false, info: 'Darah yang mengalir haram dimakan', hadits: false },
+  { emoji: '🎰', name: 'Makanan Haram', isHalal: false, info: 'Makanan dari hasil yang tidak halal', hadits: false },
+  { emoji: '☠️', name: 'Racun', isHalal: false, info: 'Sesuatu yang membahayakan tubuh', hadits: false },
+];
+
+const HADITS_DATA = [
+  {
+    icon: '🌴',
+    arabic: 'إِذَا أَفْطَرَ أَحَدُكُمْ فَلْيُفْطِرْ عَلَى تَمْرٍ',
+    translation: '"Apabila seseorang dari kalian berbuka, hendaklah ia berbuka dengan kurma."',
+    source: '— HR. Abu Dawud & Tirmidzi'
+  },
+  {
+    icon: '🍯',
+    arabic: 'فِي الْعَسَلِ شِفَاءٌ لِلنَّاسِ',
+    translation: '"Di dalam madu terdapat obat yang menyembuhkan manusia."',
+    source: '— QS. An-Nahl: 69'
+  },
+  {
+    icon: '🌱',
+    arabic: 'عَلَيْكُمْ بِالسَّوْدَاءِ فَإِنَّهَا شِفَاءٌ مِنْ كُلِّ دَاءٍ',
+    translation: '"Gunakanlah habbatussauda, sesungguhnya ia adalah obat dari segala penyakit kecuali kematian."',
+    source: '— HR. Bukhari & Muslim'
+  },
+  {
+    icon: '💧',
+    arabic: 'مَاءُ زَمْزَمَ لِمَا شُرِبَ لَهُ',
+    translation: '"Air Zamzam itu sesuai dengan niat orang yang meminumnya."',
+    source: '— HR. Ibnu Majah'
+  },
+  {
+    icon: '🫒',
+    arabic: 'كُلُوا الزَّيْتَ وَادَّهِنُوا بِهِ',
+    translation: '"Makanlah minyak zaitun dan gunakanlah ia sebagai minyak rambut."',
+    source: '— HR. Tirmidzi'
+  },
+];
+
+// ==================== STATE ====================
+let state = {
+  playerName: '',
+  playerId: '',
+  level: 1,
+  score: 0,
+  levelProgress: 0, // correct answers in current level
+  levelTarget: 5,
+  currentFood: null,
+  foodQueue: [],
+  haditsShown: [],
+  gameStarted: false,
+  touchStartX: 0,
+  touchStartY: 0,
+  isDragging: false,
+};
+
+// ==================== SCREEN MANAGEMENT ====================
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+// ==================== FLOATING ITEMS (LANDING) ====================
+function initFloating() {
+  const items = ['🌴','🍯','🫒','💧','🌱','⭐','🍎','🌾'];
+  const container = document.getElementById('floatingItems');
+  if (!container) return;
+  container.innerHTML = '';
+  items.forEach((em, i) => {
+    const el = document.createElement('div');
+    el.className = 'float-emoji';
+    el.textContent = em;
+    el.style.left = (10 + i * 12) % 90 + '%';
+    el.style.animationDuration = (8 + i * 2.5) + 's';
+    el.style.animationDelay = (i * 1.2) + 's';
+    container.appendChild(el);
+  });
+}
+initFloating();
+
+// ==================== REGISTER ====================
+function goToRegister() {
+  // Check if already has saved ID
+  const savedId = localStorage.getItem('sunnah_chef_id');
+  const savedName = localStorage.getItem('sunnah_chef_name');
+  if (savedId && savedName) {
+    state.playerId = savedId;
+    state.playerName = savedName;
+    state.score = parseInt(localStorage.getItem('sunnah_chef_score') || '0');
+    state.level = parseInt(localStorage.getItem('sunnah_chef_level') || '1');
+    document.getElementById('welcome-name').textContent = savedName;
+    document.getElementById('welcome-id').textContent = savedId;
+    showScreen('screen-welcome');
+    return;
+  }
+  showScreen('screen-register');
+}
+
+async function doRegister() {
+  const nama = document.getElementById('reg-nama').value.trim();
+  const wa = document.getElementById('reg-wa').value.trim();
+  const email = document.getElementById('reg-email').value.trim();
+  let valid = true;
+
+  // Validate name
+  document.getElementById('reg-nama').classList.remove('error');
+  document.getElementById('err-nama').classList.remove('show');
+  if (!nama) {
+    document.getElementById('reg-nama').classList.add('error');
+    document.getElementById('err-nama').classList.add('show');
+    valid = false;
+  }
+
+  // Validate WA
+  document.getElementById('reg-wa').classList.remove('error');
+  document.getElementById('err-wa').classList.remove('show');
+  const waRegex = /^\+62[0-9]{9,13}$/;
+  if (!waRegex.test(wa)) {
+    document.getElementById('reg-wa').classList.add('error');
+    document.getElementById('err-wa').classList.add('show');
+    valid = false;
+  }
+
+  // Validate email (optional)
+  document.getElementById('reg-email').classList.remove('error');
+  document.getElementById('err-email').classList.remove('show');
+  if (email) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      document.getElementById('reg-email').classList.add('error');
+      document.getElementById('err-email').classList.add('show');
+      valid = false;
+    }
+  }
+  if (!valid) return;
+
+  showLoading('Mendaftarkan akun...');
+
+  // Try Google Sheets
+  const gasResult = await gasPost({ action: 'register', nama, whatsapp: wa, email });
+
+  let id, playerName;
+
+  if (gasResult.ok) {
+    // Success via GAS
+    id = gasResult.id;
+    playerName = gasResult.nama;
+    if (gasResult.isExisting) {
+      showToast('Akun ditemukan! ID lama kamu dikembalikan 🌴', 'info');
+    } else {
+      showToast('Pendaftaran berhasil! JazakAllah 🌟', 'success');
+    }
+  } else {
+    // Offline fallback — generate local ID
+    id = 'SUN-' + Math.random().toString(36).substr(2, 4).toUpperCase();
+    playerName = nama;
+    showToast('Mode offline — data tersimpan di HP 📱', 'info');
+  }
+
+  // Save to localStorage
+  state.playerName = playerName;
+  state.playerId = id;
+  state.score = 0;
+  state.level = 1;
+  localStorage.setItem('sunnah_chef_id', id);
+  localStorage.setItem('sunnah_chef_name', playerName);
+  localStorage.setItem('sunnah_chef_score', '0');
+  localStorage.setItem('sunnah_chef_level', '1');
+  localStorage.setItem('sunnah_chef_wa', wa);
+
+  hideLoading();
+  document.getElementById('welcome-name').textContent = playerName;
+  document.getElementById('welcome-id').textContent = id;
+  showScreen('screen-welcome');
+}
+
+async function doLogin() {
+  const inputId = document.getElementById('login-id').value.trim().toUpperCase();
+  document.getElementById('err-loginid').classList.remove('show');
+  document.getElementById('login-id').classList.remove('error');
+
+  if (!inputId.startsWith('SUN-') || inputId.length < 7) {
+    document.getElementById('err-loginid').classList.add('show');
+    document.getElementById('login-id').classList.add('error');
+    return;
+  }
+
+  showLoading('Mencari akun kamu...');
+
+  // Try GAS first
+  const gasResult = await gasGet({ action: 'login', id: inputId });
+
+  if (gasResult.ok) {
+    state.playerId   = gasResult.id;
+    state.playerName = gasResult.nama;
+    state.score      = parseInt(gasResult.total_score) || 0;
+    state.level      = parseInt(gasResult.level_reached) || 1;
+    // Sync localStorage
+    localStorage.setItem('sunnah_chef_id',    gasResult.id);
+    localStorage.setItem('sunnah_chef_name',  gasResult.nama);
+    localStorage.setItem('sunnah_chef_score', state.score);
+    localStorage.setItem('sunnah_chef_level', state.level);
+    hideLoading();
+    showToast(`Selamat datang, ${gasResult.nama}! 🌴`, 'success');
+    document.getElementById('welcome-name').textContent = state.playerName;
+    document.getElementById('welcome-id').textContent   = state.playerId;
+    showScreen('screen-welcome');
+    return;
+  }
+
+  // Fallback: cek localStorage
+  const savedId = localStorage.getItem('sunnah_chef_id');
+  if (savedId && savedId === inputId) {
+    state.playerId   = savedId;
+    state.playerName = localStorage.getItem('sunnah_chef_name') || 'Pemain';
+    state.score      = parseInt(localStorage.getItem('sunnah_chef_score') || '0');
+    state.level      = parseInt(localStorage.getItem('sunnah_chef_level') || '1');
+    hideLoading();
+    showToast('Mode offline — data dari HP 📱', 'info');
+    document.getElementById('welcome-name').textContent = state.playerName;
+    document.getElementById('welcome-id').textContent   = state.playerId;
+    showScreen('screen-welcome');
+    return;
+  }
+
+  hideLoading();
+  document.getElementById('err-loginid').classList.add('show');
+  document.getElementById('login-id').classList.add('error');
+}
+
+// ==================== GAME CORE ====================
+function startGame() {
+  state.levelProgress = 0;
+  shuffleFoodQueue();
+  showScreen('screen-game');
+  updateHUD();
+  showNextFood();
+}
+
+function shuffleFoodQueue() {
+  // Mix halal and haram, ensure variety
+  let pool = [...FOOD_DATA].sort(() => Math.random() - 0.5);
+  state.foodQueue = pool;
+}
+
+function getNextFood() {
+  if (state.foodQueue.length === 0) shuffleFoodQueue();
+  return state.foodQueue.pop();
+}
+
+function showNextFood() {
+  const food = getNextFood();
+  state.currentFood = food;
+
+  const area = document.getElementById('falling-area');
+  area.innerHTML = '';
+
+  const item = document.createElement('div');
+  item.className = 'food-item';
+  item.id = 'current-food';
+  item.draggable = true;
+  item.innerHTML = `
+    <span class="food-emoji">${food.emoji}</span>
+    <span class="food-name">${food.name}</span>
+  `;
+
+  // Desktop drag
+  item.addEventListener('dragstart', onDragStart);
+  item.addEventListener('dragend', onDragEnd);
+
+  // Touch events
+  item.addEventListener('touchstart', onTouchStart, {passive: true});
+  item.addEventListener('touchmove', onTouchMove, {passive: false});
+  item.addEventListener('touchend', onTouchEnd);
+
+  area.appendChild(item);
+  updateHadits();
+}
+
+function updateHUD() {
+  document.getElementById('hdr-level').textContent = `Level ${state.level} • ${state.levelProgress}/${state.levelTarget}`;
+  document.getElementById('hdr-score').textContent = state.score;
+  document.getElementById('progress-fill').style.width = (state.levelProgress / state.levelTarget * 100) + '%';
+}
+
+function updateHadits() {
+  const banners = [
+    '🌿 <em>"Makanlah makanan yang halal lagi baik..."</em> (QS. Al-Baqarah: 168)',
+    '🍯 <em>"Di dalam madu terdapat obat..."</em> (QS. An-Nahl: 69)',
+    '💧 <em>"Air Zamzam itu sesuai niat yang meminumnya..."</em> (HR. Ibnu Majah)',
+    '🌴 <em>"Berbukalah dengan kurma..."</em> (HR. Abu Dawud)',
+    '🌱 <em>"Habbatussauda obat dari segala penyakit..."</em> (HR. Bukhari)',
+  ];
+  document.getElementById('hadits-banner').innerHTML = banners[Math.floor(Math.random() * banners.length)];
+}
+
+function processAnswer(choiceHalal) {
+  const food = state.currentFood;
+  const correct = food.isHalal === choiceHalal;
+
+  if (correct) {
+    state.score += 10;
+    state.levelProgress++;
+    localStorage.setItem('sunnah_chef_score', state.score);
+    showFeedback(true, food.info);
+    spawnParticles('✨');
+  } else {
+    showFeedback(false, food.isHalal ? `${food.name} itu sunnah Nabi ﷺ! Pindah ke piring sunnah ya!` : `${food.name} itu tidak boleh dimakan ya!`);
+  }
+
+  updateHUD();
+
+  setTimeout(() => {
+    hideFeedback();
+    if (state.levelProgress >= state.levelTarget) {
+      levelUp();
+    } else {
+      showNextFood();
+    }
+  }, correct ? 1400 : 1800);
+}
+
+function levelUp() {
+  // Save score to GAS (fire-and-forget)
+  gasPost({
+    action: 'save_score',
+    player_id: state.playerId,
+    total_score: state.score,
+    level_reached: state.level,
+  }).then(r => { if (r.ok) showToast('Skor tersimpan ke cloud ☁️', 'success'); });
+
+  // Save session
+  gasPost({
+    action: 'save_session',
+    player_id: state.playerId,
+    level: state.level,
+    score: state.score,
+    correct_answers: state.levelProgress,
+  });
+
+  // Show hadits
+  const hadits = HADITS_DATA[Math.min(state.level - 1, HADITS_DATA.length - 1)];
+  document.getElementById('hadits-unlock-icon').textContent = hadits.icon;
+  document.getElementById('hadits-arabic').textContent = hadits.arabic;
+  document.getElementById('hadits-translation').textContent = hadits.translation;
+  document.getElementById('hadits-source').textContent = hadits.source;
+  showScreen('screen-hadits');
+}
+
+function goToLevelComplete() {
+  document.getElementById('lc-title').textContent = `Level ${state.level} Selesai! 🎉`;
+  document.getElementById('lc-points').textContent = `+${state.levelProgress * 10} Poin`;
+  state.level++;
+  localStorage.setItem('sunnah_chef_level', state.level);
+  showScreen('screen-levelcomplete');
+
+  // Animate stars
+  setTimeout(() => {
+    document.querySelectorAll('.lc-star').forEach((s, i) => {
+      setTimeout(() => s.classList.add('earned'), i * 200);
+    });
+  }, 100);
+}
+
+function nextLevel() {
+  state.levelProgress = 0;
+  state.levelTarget = Math.min(5 + Math.floor(state.level / 3), 10);
+  shuffleFoodQueue();
+  showScreen('screen-game');
+  updateHUD();
+  showNextFood();
+}
+
+// ==================== FEEDBACK ====================
+function showFeedback(correct, text) {
+  if (correct) {
+    document.getElementById('feedback-correct-text').textContent = text;
+    document.getElementById('feedback-correct').classList.add('show');
+  } else {
+    document.getElementById('feedback-wrong-text').textContent = text;
+    document.getElementById('feedback-wrong').classList.add('show');
+  }
+}
+function hideFeedback() {
+  document.getElementById('feedback-correct').classList.remove('show');
+  document.getElementById('feedback-wrong').classList.remove('show');
+}
+
+function spawnParticles(emoji) {
+  const particles = ['✨','🌟','⭐','💫','🍯'];
+  for (let i = 0; i < 6; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    p.textContent = particles[Math.floor(Math.random() * particles.length)];
+    p.style.left = (40 + Math.random() * 20) + '%';
+    p.style.top = (40 + Math.random() * 20) + '%';
+    p.style.setProperty('--dx', (Math.random() * 160 - 80) + 'px');
+    p.style.setProperty('--dy', (Math.random() * -120 - 40) + 'px');
+    p.style.animationDelay = (Math.random() * 0.3) + 's';
+    document.body.appendChild(p);
+    setTimeout(() => p.remove(), 1200);
+  }
+}
+
+// ==================== DRAG & DROP (DESKTOP) ====================
+let draggedFood = null;
+function onDragStart(e) {
+  draggedFood = state.currentFood;
+  document.getElementById('current-food').classList.add('dragging');
+  const ghost = document.getElementById('drag-ghost');
+  ghost.textContent = state.currentFood.emoji;
+  ghost.style.display = 'block';
+}
+function onDragEnd(e) {
+  document.getElementById('current-food')?.classList.remove('dragging');
+  document.getElementById('drag-ghost').style.display = 'none';
+}
+function onDragOver(e, zone) {
+  e.preventDefault();
+  document.getElementById('zone-' + zone).classList.add('drag-over');
+}
+function onDragLeave(zone) {
+  document.getElementById('zone-' + zone).classList.remove('drag-over');
+}
+function onDrop(e, zone) {
+  e.preventDefault();
+  document.getElementById('zone-' + zone).classList.remove('drag-over');
+  document.getElementById('zone-halal').classList.remove('drag-over');
+  document.getElementById('zone-haram').classList.remove('drag-over');
+  if (!state.currentFood) return;
+  processAnswer(zone === 'halal');
+  state.currentFood = null;
+}
+// Position ghost with mouse
+document.addEventListener('dragover', e => {
+  const g = document.getElementById('drag-ghost');
+  g.style.left = e.clientX + 'px';
+  g.style.top = e.clientY + 'px';
+});
+
+// ==================== TOUCH DRAG ====================
+let touchGhost = null;
+function onTouchStart(e) {
+  const touch = e.touches[0];
+  state.touchStartX = touch.clientX;
+  state.touchStartY = touch.clientY;
+  state.isDragging = false;
+
+  // Create visual ghost
+  touchGhost = document.createElement('div');
+  touchGhost.style.cssText = `
+    position:fixed; pointer-events:none; z-index:9999;
+    font-size:4rem; transform:translate(-50%,-50%);
+    left:${touch.clientX}px; top:${touch.clientY}px;
+    transition:none; opacity:0.8;
+  `;
+  touchGhost.textContent = state.currentFood?.emoji || '';
+  document.body.appendChild(touchGhost);
+}
+
+function onTouchMove(e) {
+  e.preventDefault();
+  const touch = e.touches[0];
+  state.isDragging = true;
+  if (touchGhost) {
+    touchGhost.style.left = touch.clientX + 'px';
+    touchGhost.style.top = touch.clientY + 'px';
+  }
+
+  // Highlight zones
+  const el = document.elementFromPoint(touch.clientX, touch.clientY);
+  document.getElementById('zone-halal').classList.remove('drag-over');
+  document.getElementById('zone-haram').classList.remove('drag-over');
+  if (el?.closest('#zone-halal')) document.getElementById('zone-halal').classList.add('drag-over');
+  if (el?.closest('#zone-haram')) document.getElementById('zone-haram').classList.add('drag-over');
+}
+
+function onTouchEnd(e) {
+  if (touchGhost) { touchGhost.remove(); touchGhost = null; }
+  document.getElementById('zone-halal').classList.remove('drag-over');
+  document.getElementById('zone-haram').classList.remove('drag-over');
+
+  if (!state.currentFood) return;
+
+  const touch = e.changedTouches[0];
+  const dx = touch.clientX - state.touchStartX;
+
+  if (Math.abs(dx) < 40 && !state.isDragging) return; // too small
+
+  // Check drop target
+  const el = document.elementFromPoint(touch.clientX, touch.clientY);
+  if (el?.closest('#zone-halal')) {
+    processAnswer(true);
+  } else if (el?.closest('#zone-haram')) {
+    processAnswer(false);
+  } else {
+    // Swipe direction fallback
+    if (Math.abs(dx) > 60) {
+      processAnswer(dx > 0); // right = halal, left = haram
+    }
+    return;
+  }
+  state.currentFood = null;
+}
+
+function onTouchEndZone(e, zone) {
+  // handled in onTouchEnd
+}
+
+// ==================== MODALS ====================
+function showPauseModal() { document.getElementById('modal-pause').classList.add('show'); }
+function closePauseModal() { document.getElementById('modal-pause').classList.remove('show'); }
+function openInfaqModal() {
+  document.getElementById('modal-infaq').classList.add('show');
+  // Log infaq interest to GAS
+  gasPost({
+    action: 'log_infaq',
+    player_id: state.playerId,
+    nama_player: state.playerName,
+    nominal: 0,
+    pesan: 'Interest — belum transfer',
+  });
+}
+function closeInfaqModal() { document.getElementById('modal-infaq').classList.remove('show'); }
+
+function goHome() {
+  closePauseModal();
+  showScreen('screen-landing');
+}
+
+// ==================== SHARE ====================
+function shareWhatsApp() {
+  const msg = `🎮 Aku baru selesai Level ${state.level - 1} di *Sunnah Chef* dengan skor ${state.score}! 🌴🍯\n\nGame edukasi Islam seru buat anak-anak, belajar makanan sunnah Nabi ﷺ sambil bermain!\n\n📱 Coba juga: https://goldenflow.id/sunnah-chef\n\n@goldenflow.id 🌿`;
+  window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank');
+}
+
+// ==================== KEYBOARD SUPPORT ====================
+document.addEventListener('keydown', (e) => {
+  if (!document.getElementById('screen-game').classList.contains('active')) return;
+  if (!state.currentFood) return;
+  if (e.key === 'ArrowRight' || e.key === 'd') { processAnswer(true); state.currentFood = null; }
+  if (e.key === 'ArrowLeft' || e.key === 'a') { processAnswer(false); state.currentFood = null; }
+});
+</script>
+</body>
+</html>
